@@ -1,3 +1,5 @@
 databaseChangeLog:
   - include:
       file: db/changelog/v.1.0.0/2025-01-12--01-create-credit-application.xml
+  - include:
+      file: db/changelog/v.1.0.0/2025-01-12--02-create-credit-credit_outbox.xml

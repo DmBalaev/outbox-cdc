@@ -10,7 +10,7 @@ public class CreditClaimPublisher {
     public static final String CREDIT_CLAIM_TOPIC = "credit-claim";
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void sendStatusUpdate(String topic, Object message) {
-        kafkaTemplate.send(topic, message);
+    public void sendStatusUpdate(Object message) {
+        kafkaTemplate.send(CREDIT_CLAIM_TOPIC, message);
     }
 }

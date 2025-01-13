@@ -13,7 +13,7 @@ public class CreditClaimStatusListner {
     }
 
     private void sendNotification(String message) {
-        System.out.printf("Sending notification: Claim updated status %s", message);
+        System.out.printf("Sending notification: Claim updated status %s\n", message);
     }
 
 }
