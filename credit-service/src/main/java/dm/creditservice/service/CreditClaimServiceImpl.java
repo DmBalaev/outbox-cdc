@@ -4,11 +4,14 @@ import dm.creditservice.entity.ClaimStatus;
 import dm.creditservice.entity.CreditClaimEntity;
 import dm.creditservice.event.CreditClaimEvent;
 import dm.creditservice.exception.ResourceNotFound;
+import dm.creditservice.mapper.CreditClaimMapper;
 import dm.creditservice.payload.CreateCreditClaimRequest;
 import dm.creditservice.publisher.CreditClaimPublisher;
 import dm.creditservice.repository.CreditClaimRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,6 +22,7 @@ import java.util.UUID;
 public class CreditClaimServiceImpl implements CreditClaimService {
     private final CreditClaimRepository claimRepository;
     private final CreditClaimPublisher creditClaimPublisher;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public CreditClaimEntity createCreditClaim(CreateCreditClaimRequest request) {
@@ -37,15 +41,15 @@ public class CreditClaimServiceImpl implements CreditClaimService {
     }
 
     @Override
+    @Transactional
     public CreditClaimEntity updateCreditClaimStatus(UUID claimId, ClaimStatus claimStatus) {
         CreditClaimEntity claimEntity = claimRepository.findById(claimId)
                 .orElseThrow(() -> new ResourceNotFound("Credit Claim not found"));
         claimEntity.setStatus(claimStatus);
         claimEntity.setUpdateAt(LocalDate.now());
 
-        //При обновлении отправляем в кафку сообщение о смене статуса
-        CreditClaimEvent event = new CreditClaimEvent(claimEntity.getId(), claimStatus);
-        creditClaimPublisher.sendStatusUpdate(CreditClaimPublisher.CREDIT_CLAIM_TOPIC, event);
+        //При обновлении публикуем эвент о смене статуса
+        applicationEventPublisher.publishEvent(claimEntity);
 
         return claimRepository.save(claimEntity);
     }
