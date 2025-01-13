@@ -2,8 +2,10 @@ package dm.creditservice.service;
 
 import dm.creditservice.entity.ClaimStatus;
 import dm.creditservice.entity.CreditClaimEntity;
+import dm.creditservice.event.CreditClaimEvent;
 import dm.creditservice.exception.ResourceNotFound;
 import dm.creditservice.payload.CreateCreditClaimRequest;
+import dm.creditservice.publisher.CreditClaimPublisher;
 import dm.creditservice.repository.CreditClaimRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CreditClaimServiceImpl implements CreditClaimService {
     private final CreditClaimRepository claimRepository;
+    private final CreditClaimPublisher creditClaimPublisher;
 
     @Override
     public CreditClaimEntity createCreditClaim(CreateCreditClaimRequest request) {
@@ -39,6 +42,11 @@ public class CreditClaimServiceImpl implements CreditClaimService {
                 .orElseThrow(() -> new ResourceNotFound("Credit Claim not found"));
         claimEntity.setStatus(claimStatus);
         claimEntity.setUpdateAt(LocalDate.now());
+
+        //При обновлении отправляем в кафку сообщение о смене статуса
+        CreditClaimEvent event = new CreditClaimEvent(claimEntity.getId(), claimStatus);
+        creditClaimPublisher.sendStatusUpdate(CreditClaimPublisher.CREDIT_CLAIM_TOPIC, event);
+
         return claimRepository.save(claimEntity);
     }
 }

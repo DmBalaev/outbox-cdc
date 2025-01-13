@@ -15,5 +15,11 @@ spring:
     password: ${DB_PASSWORD:postgres}
     url: ${DB_URL:jdbc:postgresql://localhost:5432/abs}
 
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
 server:
   port: 8081
