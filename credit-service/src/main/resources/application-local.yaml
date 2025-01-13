@@ -21,5 +21,13 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
+credit:
+  datasource:
+    host: localhost
+    port: 5432
+    database: abs
+    username: postgres
+    password: postgres
+
 server:
   port: 8081
