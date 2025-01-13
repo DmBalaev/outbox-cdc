@@ -5,6 +5,7 @@ import dm.creditservice.entity.CreditClaimEntity;
 import dm.creditservice.mapper.CreditClaimMapper;
 import dm.creditservice.payload.CreateCreditClaimRequest;
 import dm.creditservice.payload.CreditClaimResponse;
+import dm.creditservice.payload.UpdateStatusRequest;
 import dm.creditservice.service.CreditClaimService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -38,8 +39,8 @@ public class CreditClaimController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CreditClaimResponse> updateStatus(@PathVariable UUID id, @RequestBody ClaimStatus status) {
-        CreditClaimEntity claimEntity = creditClaimService.updateCreditClaimStatus(id, status);
+    public ResponseEntity<CreditClaimResponse> updateStatus(@PathVariable UUID id, @RequestBody UpdateStatusRequest request) {
+        CreditClaimEntity claimEntity = creditClaimService.updateCreditClaimStatus(id, ClaimStatus.valueOf(request.status().toUpperCase()));
         return ResponseEntity.ok(creditClaimMapper.toDto(claimEntity));
     }
 }
